@@ -4,7 +4,23 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="twitter:card" content="summary">
+		<meta name="twitter:title" content="BMW SPEC Search">
+		<meta name="twitter:description" content="Search BMW spec by Finnish license plate or by VIN number">
+		<meta property="og:title" content="BMW SPEC Search">
+		<meta property="og:site_name" content="BMW SPEC Search">
+		<meta property="og:description" content="Search BMW spec by Finnish license plate or by VIN number">
+		<meta property="og:type" content="website">
 		%sveltekit.head%
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-NBGD3X3B10"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+		
+		  gtag('config', 'G-NBGD3X3B10');
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
