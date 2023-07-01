@@ -6,7 +6,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Input from '$lib/components/Input.svelte';
 
-	let mode: 'VIN' | 'PLATE' = $page.url.searchParams.has('vin') ? 'VIN' : 'PLATE';
+	let mode: 'VIN' | 'PLATE' = 'PLATE';
 
 	async function handleNumberplateQuery(event: SubmitEvent) {
 		const data = new FormData(event.target as HTMLFormElement);
@@ -45,7 +45,6 @@
 					name="plate"
 					id="plate"
 					placeholder="ABC-123"
-					value={$page.url.searchParams.get('plate')}
 					pattern={numberPlateRegex.source}
 					class="rounded-e-none w-full"
 					required
@@ -56,7 +55,6 @@
 					name="vin"
 					id="vin"
 					placeholder="17 digit VIN number"
-					value={$page.url.searchParams.get('vin')}
 					pattern={vinRegex.source}
 					class="rounded-e-none w-full"
 					required
@@ -65,5 +63,11 @@
 			<Button type="submit" emphasis="high" class="justify-center rounded-s-none">Search</Button>
 		</div>
 	</form>
-	<Button on:click={toggleMode} size="small" class="mt-4">Toggle search mode</Button>
+	<Button on:click={toggleMode} size="small" class="mt-4">
+		{#if mode == 'PLATE'}
+			Search by VIN instead
+		{:else}
+			Search by licence plate instead
+		{/if}
+	</Button>
 </div>

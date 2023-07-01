@@ -31,6 +31,6 @@
 	export { classNames as class };
 </script>
 
-<button {type} class={twMerge(button({ size, emphasis }), classNames)} on:click|self|stopPropagation {...$$restProps}>
+<button {type} class={twMerge(button({ size, emphasis }), classNames)} on:click|stopPropagation {...$$restProps}>
 	<slot />
 </button>

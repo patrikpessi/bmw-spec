@@ -3,8 +3,6 @@ import type { PageLoad } from './$types';
 import { getVehicleSpecByNumberPlate, getVehicleSpecByVin } from '$lib/api';
 import { error } from '@sveltejs/kit';
 
-export const ssr = false;
-
 export const load = (async ({ url }) => {
 	const searchParams = url.searchParams;
 	try {
