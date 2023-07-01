@@ -1,29 +1,26 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { createDialog, numberPlateRegex, vinRegex } from '$lib/helpers';
-	import * as api from '$lib/api';
+	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
+	import { numberPlateRegex, vinRegex } from '$lib/helpers';
 	import Button from '$lib/components/Button.svelte';
 	import Input from '$lib/components/Input.svelte';
 
-	let mode: 'VIN' | 'PLATE' = 'PLATE';
-	let html: string;
+	let mode: 'VIN' | 'PLATE' = $page.url.searchParams.has('vin') ? 'VIN' : 'PLATE';
 
 	async function handleNumberplateQuery(event: SubmitEvent) {
-		try {
-			const data = new FormData(event.target as HTMLFormElement);
-			html = await api.getVehicleSpecByNumberPlate(data.get('plate') as string);
-		} catch (error) {
-			createDialog('Error', error.message);
-		}
+		const data = new FormData(event.target as HTMLFormElement);
+		const url = new URL(`${base}/search`, $page.url);
+		const plate = data.get('plate') as string;
+		url.searchParams.append('plate', plate.toUpperCase());
+		await goto(url);
 	}
 
 	async function handleVinQuery(event: SubmitEvent) {
-		try {
-			const data = new FormData(event.target as HTMLFormElement);
-			html = await api.getVehicleSpecByVin(data.get('vin') as string);
-		} catch (error) {
-			createDialog('Error', error.message);
-		}
+		const data = new FormData(event.target as HTMLFormElement);
+		const url = new URL(`${base}/search`, $page.url);
+		url.searchParams.append('vin', data.get('vin') as string);
+		await goto(url);
 	}
 
 	function toggleMode() {
@@ -32,18 +29,17 @@
 	}
 </script>
 
-<div class="prose prose-invert mx-auto p-6 w-full max-w-[80ch]">
-	<img alt="BMW Logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" class="w-24 h-24 mx-auto" />
-	<h1 class="text-center font-extrabold">BMW SPEC Search</h1>
-	<div class="not-prose flex flex-row items-center gap-4">
-		<Button on:click={toggleMode} size="small">Toggle Mode</Button>
-		<p>Mode {mode}</p>
-	</div>
+<div class="prose prose-invert m-auto p-6 w-full max-w-[60ch]">
+	<img alt="BMW Logo" src="/images/BMW_logo_(white).svg.png" class="w-24 h-24 mx-auto" />
+	<h1 class="font-extrabold text-center">BMW SPEC Search</h1>
 	{#if mode == 'PLATE'}
-		<p>Search BMW spec by <strong>Finnish</strong> licence plate</p>
-		<form on:submit={handleNumberplateQuery} class="not-prose flex flex-col gap-2">
-			<div class="flex flex-col">
-				<label for="plate">Licence plate number:</label>
+		<p>Search by <strong>Finnish</strong> licence plate</p>
+	{:else}
+		<p>Search by <strong>VIN</strong> number</p>
+	{/if}
+	<form on:submit|preventDefault={mode == 'PLATE' ? handleNumberplateQuery : handleVinQuery} class="not-prose flex flex-col gap-3">
+		<div class="flex flex-row w-full">
+			{#if mode == 'PLATE'}
 				<Input
 					type="text"
 					name="plate"
@@ -51,15 +47,10 @@
 					placeholder="ABC-123"
 					value={$page.url.searchParams.get('plate')}
 					pattern={numberPlateRegex.source}
+					class="rounded-e-none w-full"
+					required
 				/>
-			</div>
-			<Button type="submit" emphasis="high" class="justify-center">Search</Button>
-		</form>
-	{:else if mode == 'VIN'}
-		<p>Search BMW spec by VIN number</p>
-		<form on:submit={handleVinQuery} class="not-prose flex flex-col gap-2">
-			<div class="flex flex-col">
-				<label for="vin">VIN:</label>
+			{:else}
 				<Input
 					type="text"
 					name="vin"
@@ -67,12 +58,12 @@
 					placeholder="17 digit VIN number"
 					value={$page.url.searchParams.get('vin')}
 					pattern={vinRegex.source}
+					class="rounded-e-none w-full"
+					required
 				/>
-			</div>
-			<Button type="submit" emphasis="high" class="justify-center">Search</Button>
-		</form>
-	{/if}
-	{#if html}
-		{@html html}
-	{/if}
+			{/if}
+			<Button type="submit" emphasis="high" class="justify-center rounded-s-none">Search</Button>
+		</div>
+	</form>
+	<Button on:click={toggleMode} size="small" class="mt-4">Toggle search mode</Button>
 </div>

@@ -3,12 +3,12 @@
 	import type { VariantProps } from 'class-variance-authority';
 	import { twMerge } from 'tailwind-merge';
 
-	const input = cva('flex flex-row items-center rounded bg-zinc-900 focus:outline-none focus:border-none', {
+	const input = cva('flex flex-row items-center rounded bg-zinc-800 focus:outline-none focus:border-none', {
 		variants: {
 			size: {
-				small: 'text-sm px-1 py-0.5',
-				medium: 'text-base px-2 py-1',
-				large: 'text-lg px-3 py-2'
+				small: 'text-xs px-2 py-1',
+				medium: 'text-base px-3 py-1',
+				large: 'text-lg px-5 py-2'
 			}
 		},
 		defaultVariants: {

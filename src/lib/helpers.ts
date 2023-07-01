@@ -1,7 +1,7 @@
 import { twJoin } from 'tailwind-merge';
 import Dialog from './components/Dialog.svelte';
 
-export const numberPlateRegex = /^\w{1,3}-\d{1,3}$/;
+export const numberPlateRegex = /^[A-ZÖÅÄ]{1,3}-\d{1,3}$/;
 export const vinRegex = /^\w{17}$/;
 
 export function isValidNumberPlate(plate: string): Boolean {

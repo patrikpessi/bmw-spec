@@ -5,7 +5,7 @@ export async function getVehicleVinByNumberPlate(plate: string) {
 	const url = 'https://corsproxy.io/?' + encodeURIComponent(`https://www.biltema.fi/auton-varaosahaku/${plate}/`);
 	const res = await fetch(url);
 	const text = await res.text();
-	if (!text.includes(`${plate} - BMW`)) throw new Error(`${plate} could not find a BMW with this number plate`);
+	if (!text.includes(`${plate} - BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
 	const vinFinderRegex = /(?:alustanumero\:\s)\w+/g;
 	if (!vinFinderRegex.test(text)) throw new Error('Could not find a VIN number for this number plate');
 	const vin = vinFinderRegex.exec(text)?.at(0)?.replace('alustanumero: ', '') as string;
@@ -26,7 +26,7 @@ export async function getVehicleSpecByVin(vin: string) {
 	scripts.forEach((node) => node.remove());
 	const trashRows = temp.querySelectorAll('tr:has(td a strong)');
 	trashRows.forEach((node) => node.remove());
-	return temp.innerHTML;
+	return { html: temp.innerHTML, vin };
 }
 
 export async function getVehicleSpecByNumberPlate(plate: string) {

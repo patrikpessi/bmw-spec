@@ -6,13 +6,13 @@
 	const button = cva('flex flex-row items-center rounded', {
 		variants: {
 			size: {
-				small: 'text-sm px-1 py-0.5',
-				medium: 'text-base px-2 py-1',
-				large: 'text-lg px-3 py-2'
+				small: 'text-xs px-2 py-1',
+				medium: 'text-base px-3 py-1',
+				large: 'text-lg px-5 py-1.5'
 			},
 			emphasis: {
-				high: 'bg-blue-500 text-white',
-				medium: 'bg-zinc-700 text-white',
+				high: 'bg-blue-500 hover:bg-blue-600 text-white',
+				medium: 'bg-zinc-700 hover:bg-zinc-800 text-white',
 				low: 'bg-transparent text-white border border-white'
 			}
 		},
