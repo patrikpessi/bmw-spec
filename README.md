@@ -1,3 +1,11 @@
+![BMW Logo](/static/images/BMW_logo_white_small.png 'BMW Logo')
+
+# BMW SPEC Search
+
+A tool built for searching BMW spec by Finnish license plate or by VIN number
+
+Built using Svelte Kit and Tailwindcss.
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).

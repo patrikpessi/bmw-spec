@@ -30,10 +30,10 @@
 </script>
 
 <div class="prose prose-invert m-auto p-6 w-full max-w-[60ch]">
-	<img alt="BMW Logo" src={`${assets}/images/BMW_logo_(white).svg.png`} class="w-24 h-24 mx-auto" />
+	<img alt="BMW Logo" src={`${assets}/images/BMW_logo_white.png`} class="w-24 h-24 mx-auto" />
 	<h1 class="font-extrabold text-center">BMW SPEC Search</h1>
 	{#if mode == 'PLATE'}
-		<p>Search by <strong>Finnish</strong> licence plate</p>
+		<p>Search by <strong>Finnish</strong> license plate</p>
 	{:else}
 		<p>Search by <strong>VIN</strong> number</p>
 	{/if}
@@ -67,7 +67,7 @@
 		{#if mode == 'PLATE'}
 			Search by VIN instead
 		{:else}
-			Search by licence plate instead
+			Search by license plate instead
 		{/if}
 	</Button>
 </div>
