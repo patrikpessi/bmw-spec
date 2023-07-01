@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { base } from '$app/paths';
+	import { assets, base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { numberPlateRegex, vinRegex } from '$lib/helpers';
 	import Button from '$lib/components/Button.svelte';
@@ -30,7 +30,7 @@
 </script>
 
 <div class="prose prose-invert m-auto p-6 w-full max-w-[60ch]">
-	<img alt="BMW Logo" src="/images/BMW_logo_(white).svg.png" class="w-24 h-24 mx-auto" />
+	<img alt="BMW Logo" src={`${assets}/images/BMW_logo_(white).svg.png`} class="w-24 h-24 mx-auto" />
 	<h1 class="font-extrabold text-center">BMW SPEC Search</h1>
 	{#if mode == 'PLATE'}
 		<p>Search by <strong>Finnish</strong> licence plate</p>
