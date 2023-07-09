@@ -20,6 +20,7 @@ export async function getVehicleSpecByVin(vin: string) {
 	const doc = documentFromText(text);
 	let dataNodes = [...doc.querySelectorAll('.carInfo h4,table')];
 	dataNodes = dataNodes.splice(0, dataNodes.length - 2);
+	if (dataNodes.length <= 0) throw new Error('Could not load equipment list for this vehicle');
 	const temp = doc.createElement('div');
 	dataNodes.forEach((node) => temp.appendChild(node));
 	const scripts = temp.querySelectorAll('script');
