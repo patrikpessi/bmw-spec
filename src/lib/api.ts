@@ -1,16 +1,69 @@
-import { documentFromText, isValidNumberPlate, vinRegex } from '$lib/helpers';
+import { documentFromText, vinRegex } from '$lib/helpers';
 
-export async function getVehicleVinByNumberPlate(plate: string) {
-	if (!isValidNumberPlate(plate)) throw new Error('Invalid number plate');
-	const url = 'https://corsproxy.io/?' + encodeURIComponent(`https://www.biltema.fi/auton-varaosahaku/${plate}/`);
-	const res = await fetch(url);
-	const text = await res.text();
-	if (!text.includes(`${plate} - BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
-	const vinFinderRegex = /(?:alustanumero\:\s)\w+/g;
-	if (!vinFinderRegex.test(text)) throw new Error('Could not find a VIN number for this number plate');
-	const vin = vinFinderRegex.exec(text)?.at(0)?.replace('alustanumero: ', '') as string;
-	if (vinRegex.test(text)) throw new Error(`Invalid VIN for ${plate} (VIN: ${vin})`);
-	return vin;
+export const countries = [
+	{
+		name: 'Finland',
+		code: 'FIN',
+		licensePlateExample: 'ABC-123',
+		licensePlateValidator: (plate: string) => {
+			if (/^[A-ZÅÄÖ]{2,3}-[1-9]{1}[0-9]{0,2}$/.test(plate)) return true;
+			return false;
+		},
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.fi/auton-varaosahaku/[plate]/', 'alustanumero')
+	},
+	{
+		name: 'Sweden',
+		code: 'SWE',
+		licensePlateExample: 'ABC123',
+		licensePlateValidator: (plate: string) => {
+			if (/^[A-ZÅÄÖ]{3}[0-9]{2}[A-ZÅÄÖ0-9]{1}$/.test(plate)) return true;
+			return false;
+		},
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.se/bil-reservdelar/[plate]/', 'chassinummer')
+	},
+	{
+		name: 'Norway',
+		code: 'NOR',
+		licensePlateExample: 'AB12345',
+		licensePlateValidator: (plate: string) => {
+			// TODO: Better matcher
+			if (/^[A-ZÅÄÖ]{2}[0-9]{2,5}$/.test(plate)) return true;
+			return false;
+		},
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.no/reservedelssok-bil/[plate]/', 'chassisnummer')
+	},
+	{
+		name: 'Denmark',
+		code: 'DNK',
+		licensePlateExample: 'AB12345',
+		licensePlateValidator: (plate: string) => {
+			// TODO: Better matcher
+			if (/^[A-ZÅÄÖ]{2}[0-9]{2,5}$/.test(plate)) return true;
+			return false;
+		},
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.dk/reservedelsogning-bil/[plate]/', 'chassisnummer')
+	}
+];
+
+function createBiltemaVinScraper(biltemaURL: string, searchKey: string) {
+	return async (plate: string) => {
+		biltemaURL = biltemaURL.replace('[plate]', plate);
+		let url = 'https://corsproxy.io/?' + encodeURIComponent(biltemaURL);
+		const res = await fetch(url);
+		const text = await res.text();
+		if (!text.includes(`${plate} - BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
+		const searchPattern = new RegExp(`(?:${searchKey}\\:\\s)\\w+`, 'g');
+		if (!searchPattern.test(text)) throw new Error('Could not find a VIN number for this number plate');
+		const vin = searchPattern.exec(text)?.at(0)?.replace(`${searchKey}: `, '') as string;
+		if (vinRegex.test(text)) throw new Error(`Invalid VIN for ${plate} (VIN: ${vin})`);
+		return vin;
+	};
+}
+
+export async function getVehicleVinByCountryAndPlate(countryCode: string, plate: string) {
+	const country = countries.find((country) => country.code == countryCode);
+	if (!country?.licensePlateValidator(plate)) throw new Error('Invalid number plate');
+	return await country.vinSearchFunction(plate);
 }
 
 export async function getVehicleSpecByVin(vin: string) {
@@ -30,7 +83,7 @@ export async function getVehicleSpecByVin(vin: string) {
 	return { html: temp.innerHTML, vin };
 }
 
-export async function getVehicleSpecByNumberPlate(plate: string) {
-	const vin = await getVehicleVinByNumberPlate(plate);
+export async function getVehicleSpecByCountryAndPlate(countryCode: string, plate: string) {
+	const vin = await getVehicleVinByCountryAndPlate(countryCode, plate);
 	return await getVehicleSpecByVin(vin);
 }
