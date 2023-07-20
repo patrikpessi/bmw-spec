@@ -9,7 +9,7 @@ export const countries = [
 			if (/^[A-ZÅÄÖ]{2,3}-[1-9]{1}[0-9]{0,2}$/.test(plate)) return true;
 			return false;
 		},
-		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.fi/auton-varaosahaku/[plate]/', 'alustanumero')
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.fi/auton-varaosahaku/[plate]/')
 	},
 	{
 		name: 'Sweden',
@@ -19,7 +19,7 @@ export const countries = [
 			if (/^[A-ZÅÄÖ]{3}[0-9]{2}[A-ZÅÄÖ0-9]{1}$/.test(plate)) return true;
 			return false;
 		},
-		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.se/bil-reservdelar/[plate]/', 'chassinummer')
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.se/bil-reservdelar/[plate]/')
 	},
 	{
 		name: 'Norway',
@@ -30,7 +30,7 @@ export const countries = [
 			if (/^[A-ZÅÄÖ]{2}[0-9]{2,5}$/.test(plate)) return true;
 			return false;
 		},
-		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.no/reservedelssok-bil/[plate]/', 'chassisnummer')
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.no/reservedelssok-bil/[plate]/')
 	},
 	{
 		name: 'Denmark',
@@ -41,20 +41,22 @@ export const countries = [
 			if (/^[A-ZÅÄÖ]{2}[0-9]{2,5}$/.test(plate)) return true;
 			return false;
 		},
-		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.dk/reservedelsogning-bil/[plate]/', 'chassisnummer')
+		vinSearchFunction: createBiltemaVinScraper('https://www.biltema.dk/reservedelsogning-bil/[plate]/')
 	}
 ];
 
-function createBiltemaVinScraper(biltemaURL: string, searchKey: string) {
+function createBiltemaVinScraper(biltemaURL: string) {
 	return async (plate: string) => {
 		biltemaURL = biltemaURL.replace('[plate]', plate);
 		let url = 'https://corsproxy.io/?' + encodeURIComponent(biltemaURL);
 		const res = await fetch(url);
 		const text = await res.text();
 		if (!text.includes(`${plate} - BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
-		const searchPattern = new RegExp(`(?:${searchKey}\\:\\s)\\w+`, 'g');
+		const searchPattern = /\{[^{]+?\"VinNumber\"[^}]+?\}/;
+		console.log('text', text);
 		if (!searchPattern.test(text)) throw new Error('Could not find a VIN number for this number plate');
-		const vin = searchPattern.exec(text)?.at(0)?.replace(`${searchKey}: `, '') as string;
+		const data = searchPattern.exec(text)?.at(0) as string;
+		const vin = JSON.parse(data).value;
 		if (vinRegex.test(text)) throw new Error(`Invalid VIN for ${plate} (VIN: ${vin})`);
 		return vin;
 	};
@@ -73,7 +75,7 @@ export async function getVehicleSpecByVin(vin: string) {
 	const doc = documentFromText(text);
 	let dataNodes = [...doc.querySelectorAll('.carInfo h4,table')];
 	dataNodes = dataNodes.splice(0, dataNodes.length - 2);
-	if (dataNodes.length <= 0) throw new Error('Could not load equipment list for this vehicle');
+	if (dataNodes.length <= 0) throw new Error(`Could not load equipment list for this vehicle (VIN: ${vin})`);
 	const temp = doc.createElement('div');
 	dataNodes.forEach((node) => temp.appendChild(node));
 	const scripts = temp.querySelectorAll('script');
