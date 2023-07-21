@@ -51,9 +51,8 @@ function createBiltemaVinScraper(biltemaURL: string) {
 		let url = 'https://corsproxy.io/?' + encodeURIComponent(biltemaURL);
 		const res = await fetch(url);
 		const text = await res.text();
-		if (!text.includes(`${plate} - BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
-		const searchPattern = /\{[^{]+?\"VinNumber\"[^}]+?\}/;
-		console.log('text', text);
+		if (!text.includes(`- BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
+		const searchPattern = /\{[^{]+?VIN[^}]+?(WBA|WBS|4US|NCO)[^}]+?\}/;
 		if (!searchPattern.test(text)) throw new Error('Could not find a VIN number for this number plate');
 		const data = searchPattern.exec(text)?.at(0) as string;
 		const vin = JSON.parse(data).value;
