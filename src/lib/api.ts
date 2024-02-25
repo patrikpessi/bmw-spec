@@ -47,8 +47,8 @@ export const countries = [
 
 function createBiltemaVinScraper(biltemaURL: string) {
 	return async (plate: string) => {
-		biltemaURL = biltemaURL.replace('[plate]', plate);
-		let url = 'https://corsproxy.io/?' + encodeURIComponent(biltemaURL);
+		const targetURL = biltemaURL.replace('[plate]', plate);
+		let url = 'https://corsproxy.io/?' + encodeURIComponent(targetURL);
 		const res = await fetch(url);
 		const text = await res.text();
 		if (!text.includes(`- BMW`)) throw new Error(`Could not find a BMW with this number plate (${plate})`);
